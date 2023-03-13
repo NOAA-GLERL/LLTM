@@ -1,0 +1,62 @@
+gfortran -fcheck=all -g -O1  -c gl_constants.f90
+gcc  -c -g -O1 cpp_util.cpp
+gfortran -fcheck=all -g -O1  -c glshfs_util.F90
+gfortran -fcheck=all -g -O1  -c glshfs_global.F90
+gfortran -fcheck=all -g -O1 -c glerldatatypesandunits.f90						 
+gfortran -fcheck=all -g -O1 -c dailydatastructures.f90
+gfortran -fcheck=all -g -O1 -c dailydatacollections.f90
+gfortran -fcheck=all -g -O1 -c glshfs_files.f90
+gfortran -fcheck=all -g -O1 -c glshfs_structureddata.f90  
+gfortran -fcheck=all -g -O1 -c lltm.f90
+lltm.f90:1086:49:
+
+             IF (TRIM(ItemName) .EQ. 'ICEALBEDO') LLTM_Config%ICEALBEDO = TextToReal(ItemValue)
+                                                 1
+Error: Cannot assign to a named constant at (1)
+lltm.f90:1087:49:
+
+             IF (TRIM(ItemName) .EQ. 'ICETHRESH') LLTM_Config%ICETHRESH = TextToReal(ItemValue)
+                                                 1
+Error: Cannot assign to a named constant at (1)
+lltm.f90:2380:36:
+
+       IceAlbedo = ModelCfg%ICEALBEDO ! JAK ADD
+                                    1
+Error: ‘icealbedo’ at (1) is not a member of the ‘tevapconfig’ structure
+lltm.f90:2578:39:
+
+          IceThresh = ModelCfg%ICETHRESH ! JAK ADD
+                                       1
+Error: ‘icethresh’ at (1) is not a member of the ‘tevapconfig’ structure
+lltm.f90:3487:22:
+
+ END MODULE LLTM_GLOBAL
+                      1
+Error: Expected label ‘lltm’ for END MODULE statement at (1)
+lltm.f90:3494:12:
+
+ PROGRAM LLTM
+            1
+Error: Unexpected PROGRAM statement in CONTAINS section at (1)
+lltm.f90:3495:21:
+
+       USE LLTM_GLOBAL
+                     1
+Error: Unexpected USE statement in CONTAINS section at (1)
+lltm.f90:3496:21:
+
+       USE GLSHFS_UTIL
+                     1
+Error: Unexpected USE statement in CONTAINS section at (1)
+lltm.f90:3497:22:
+
+       USE ERRORPROCESS
+                      1
+Error: Unexpected USE statement in CONTAINS section at (1)
+lltm.f90:3495:10:
+
+       USE LLTM_GLOBAL
+          1
+Fatal Error: Can't open module file ‘lltm_global.mod’ for reading at (1): No such file or directory
+compilation terminated.
+make: *** [lltm.o] Error 1
