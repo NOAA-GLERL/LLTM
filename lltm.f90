@@ -2539,7 +2539,9 @@ CONTAINS
          !END IF
 
          !
-         DRRI = DailyReflectedRadiationFromIceJAK(Incident, IceAlbedo)
+         IceAlbedo = ModelCfg%ICEALBEDO ! JAK ADD
+         DRRI = Incident*IceAlbedo
+         !DRRI = DailyReflectedRadiationFromIceJAK(Incident, IceAlbedo)
          !DRRI = DailyReflectedRadiationFromIce(Incident,                                   &
          !       FractionInBareIce, FractionInNewSnow, FractionInOldSnow,                   &
          !       FractionInMeltingSnow)
@@ -2627,7 +2629,9 @@ CONTAINS
       g_Incident = Incident / 2.06346
       
       
-      DRRI = DailyReflectedRadiationFromIceJAK(Incident,IceAlbedo)
+      DRRI = Incident*IceAlbedo
+      !write(*,*) DRRI, Incident, IceAlbedo
+      !DRRI = DailyReflectedRadiationFromIceJAK(Incident,IceAlbedo)
       !DRRI = DailyReflectedRadiationFromIce(Incident,                      &
        !     FractionInBareIce, FractionInNewSnow, FractionInOldSnow,       &
        !     FractionInMeltingSnow);   IF (ErrorLevel .NE. 0) GOTO 899
@@ -3106,14 +3110,14 @@ CONTAINS
 
       END FUNCTION DailyIncidentSolarRadiation
 
-      REAL FUNCTION DailyReflectedRadiationFromIceJAK(Incident, Albedo)
-          IMPLICIT NONE
-          REAL, INTENT(IN) :: Incident, Albedo
-          DailyReflectedRadiationFromIceJAK = Incident * Albedo
-
-          RETURN
-
-      END FUNCTION DailyReflectedRadiationFromIceJAK
+!      REAL FUNCTION DailyReflectedRadiationFromIceJAK(Incident, Albedo)
+!          IMPLICIT NONE
+!          REAL, INTENT(IN) :: Incident, Albedo
+!          DailyReflectedRadiationFromIceJAK = Incident * Albedo
+!
+!          RETURN
+!
+!      END FUNCTION DailyReflectedRadiationFromIceJAK
 !----------------------------------------------------------------------------
       !------------------------------------------------------------------------
       !  DailyReflectedRadiationFromIce = Daily solar radiation reflected
