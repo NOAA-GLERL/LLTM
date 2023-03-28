@@ -1047,6 +1047,8 @@ CONTAINS
       LLTM_Config%WriteBulkTransferFile    = .FALSE.   ! Do we write a file with the bulk coefficient?         default is no
       LLTM_Config%WriteTempDepthProfile    = .FALSE.   ! Do we write a file with the temp/depth profile info?  default is no
       LLTM_Config%RadiationMethod = -1
+      LLTM_Config%ICETHRESH = -9.9e29
+      LLTM_Config%ICEALBEDO = -9.9e29
 
       !
       !  Verify existence and then open the config file
@@ -1074,14 +1076,8 @@ CONTAINS
             IF (TRIM(ItemName) .EQ. 'TDP_FILE')        LLTM_Config%TDepthFile    = TRIM(ItemValue)
             IF (TRIM(ItemName) .EQ. 'APPLYOVERWATERCORRECTION') LLTM_Config%ApplyOverWaterCorrection = TextToLogical(ItemValue)
             IF (TRIM(ItemName) .EQ. 'RADIATIONMETHOD') LLTM_Config%RadiationMethod = TextToInteger(ItemValue)
-            IF (TRIM(ItemName) .EQ. 'ICEALBEDO') THEN ! TODO: always print!
-                LLTM_Config%ICEALBEDO = TextToReal(ItemValue)
-                write(*,*) 'ICE ALBEDO:', LLTM_Config%ICEALBEDO
-            END IF
-            IF (TRIM(ItemName) .EQ. 'ICETHRESH') THEN ! TODO: always print!
-                LLTM_Config%ICETHRESH = TextToReal(ItemValue)
-                write(*,*) 'ICE TEMP THRESH:', LLTM_Config%ICETHRESH
-            END IF
+            IF (TRIM(ItemName) .EQ. 'ICEALBEDO')       LLTM_Config%ICEALBEDO = TextToReal(ItemValue)
+            IF (TRIM(ItemName) .EQ. 'ICETHRESH')       LLTM_Config%ICETHRESH = TextToReal(ItemValue)
          END IF
          READ(U1, 1101, IOSTAT=IOS) Line
       END DO
@@ -1102,7 +1098,10 @@ CONTAINS
       ENDIF
       IF (LLTM_Config%BulkFile(1:3)   .NE. '---') LLTM_Config%WriteBulkTransferFile = .TRUE.
       IF (LLTM_Config%TDepthFile(1:3) .NE. '---') LLTM_Config%WriteTempDepthProfile = .TRUE.
-      
+
+      write(*,*) 'ICE TEMP THRESH:', LLTM_Config%ICETHRESH
+      write(*,*) 'ICE ALBEDO:', LLTM_Config%ICEALBEDO
+
       RETURN
       !
       !  Error handling
