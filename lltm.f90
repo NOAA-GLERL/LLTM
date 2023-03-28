@@ -1820,8 +1820,8 @@ CONTAINS
       WRITE(U1, 1018, ERR=813) EParms%Parms(8)
       WRITE(U1, 1019, ERR=813) EParms%Parms(9)
       WRITE(U1, 1020, ERR=813) EParms%Parms(10)
-      WRITE(U1, 1021, ERR=813) MissingData_Real, 11
-      WRITE(U1, 1021, ERR=813) MissingData_Real, 12
+      WRITE(U1, 1021, ERR=813) Eparms%IceThresh
+      WRITE(U1, 1021, ERR=813) Eparms%IceAlbedo
       WRITE(U1, 1021, ERR=813) MissingData_Real, 13
 
       !
@@ -1880,7 +1880,9 @@ CONTAINS
  1018 FORMAT(E12.5E2, ',   Temperature-model-related parameter, "V sub e"')
  1019 FORMAT(E12.5E2, ',   Temperature-model-related parameter, "p"')
  1020 FORMAT(E12.5E2, ',   Ice-model-related parameter, "tau sub w"')
- 1021 FORMAT(E12.5E2, ',   Unused parameters value ', I0)
+ 1021 FORMAT(E12.5E2, ',   Ice-model-related parameter, "IceThresh"')
+ 1022 FORMAT(E12.5E2, ',   Ice-model-related parameter, "IceAlbedo"')
+ 1022 FORMAT(E12.5E2, ',   Unused parameters value ', I0)
 
  1031 FORMAT(A, ',   Start Date (YYYY-MM-DD)')
  1032 FORMAT(A, ',   End   Date (YYYY-MM-DD)')
