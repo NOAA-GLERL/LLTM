@@ -1,0 +1,29 @@
+Parameter file for Large Lake Thermodynamics Model
+Created on-the-fly by the GLSHFS package.
+Used for a run starting on 1970-01-01
+hur, 3-character lake code (valid values are SUP MIC HUR GEO STC ERI ONT HGB)
+ 0.88610E+08,   Ice-model-related parameter, "tau sub a"
+ 0.67280E+01,   Temperature-model-related parameter, "a prime"
+ 0.99190E-02,   Temperature-model-related parameter, "b prime"
+ 0.29900E-01,   Temperature-model-related parameter, "F prime"
+ 0.52770E+01,   Temperature-model-related parameter, "a"
+ 0.43410E-02,   Temperature-model-related parameter, "b"
+ 0.63390E+01,   Temperature-model-related parameter, "F"
+ 0.58000E-01,   Temperature-model-related parameter, "V sub e"
+ 0.11010E+01,   Temperature-model-related parameter, "p"
+ 0.31080E+06,   Ice-model-related parameter, "tau sub w"
+ 1.00000e+00,   Ice-model-related parameter, "IceThresh"
+ 0.60000e+00,   Ice-model-related parameter, "IceAlbedo"
+-0.99000E+30,   Unused parameters value 13
+  1970-01-01,   Start Date (YYYY-MM-DD)
+  2021-02-01,   End   Date (YYYY-MM-DD)
+ 0.74925E+00,   Surface Temperature at start of run (deg C)
+-0.99990E+30,   unused
+ 0.24606E-10,   Ice Area (fraction from 0.0 to 1.0)
+ 0.10000E-03,   Ice Depth (meters)
+-0.68279E+01,   Ice Temperature (deg C)
+-0.99990E+30,   unused
+ 0.85394E+01,   Age of Current Layer
+1,   Number of wind/heat layers
+Layer, AgeOfLayer, SurfTempFromLayer, TotalHeat
+    1, 0.85394E+01, 0.10000E+01, 0.94805E-01
