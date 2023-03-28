@@ -1,5 +1,3 @@
 *.mod
 *.o
-/internal
-/run/glshfs
 trash
