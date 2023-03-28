@@ -234,8 +234,6 @@ MODULE LLTM_GLOBAL
          LOGICAL             :: WriteBulkTransferFile
          LOGICAL             :: WriteTempDepthProfile
          INTEGER             :: RadiationMethod         
-         REAL                :: IceAlbedo
-         REAL                :: IceThresh
  
       
       
@@ -247,7 +245,9 @@ MODULE LLTM_GLOBAL
       TYPE TEvapParms
          CHARACTER (LEN=3)  :: Bsn
          CHARACTER (LEN=99) :: Comments(3)
-         REAL    :: Parms(13)                   !  1-10 are relevant, 11-13 are unused
+         REAL    :: Parms(11)                   !  1-10 are relevant, 11 is  unused
+         REAL    :: IceAlbedo
+         REAL    :: IceThresh
          INTEGER :: SSeq, ESeq
          REAL    :: SurfTemp              ! deg C
          REAL    :: IceArea               ! fraction (0.0 - 1.0)
@@ -388,6 +388,7 @@ CONTAINS
       REAL :: Runoff, Precipitation, Inflow, Outflow
       REAL :: SurfaceElevation, OtherTerms, LakeEvaporation
       REAL :: P1, P2, P3, P4, P5, P6, P7, P8, P9, P10
+      REAL :: IceAlbedo, IceThresh
       REAL :: DD1, DD2, TT1, A, B, Delta, Temp
       REAL :: OutVal(20)
       REAL :: VapPres, XDewPt                 ! inline function and the variable used for it
@@ -586,6 +587,13 @@ CONTAINS
       P9  = ModelParms%Parms(9)
       P10 = ModelParms%Parms(10)
 
+
+      ! Add ice threshold and ice albedo params (JAK Mar 2023)
+      IceThresh = ModelParms%IceThresh
+      IceAlbedo = ModelParms%IceAlbedo
+
+
+
       !
       !  Calculate some global constants based on the value of the parameters.
       !  These are used in various calculations of heat storage, surface temp, etc.
@@ -757,7 +765,7 @@ CONTAINS
              Dy, Mn, Yr, DailyMet,                          &
              Runoff, Precipitation, Inflow, Outflow,        &
              OtherTerms, SurfaceElevation,                  &
-             LakeEvaporation)
+             LakeEvaporation, IceThresh, IceAlbedo)
          IF (ErrorLevel .NE. 0) GOTO 899
          
          IF (g_MonitoringDepth .GT. 0.0) THEN                                    ! 24apr01
@@ -1074,14 +1082,6 @@ CONTAINS
             IF (TRIM(ItemName) .EQ. 'TDP_FILE')        LLTM_Config%TDepthFile    = TRIM(ItemValue)
             IF (TRIM(ItemName) .EQ. 'APPLYOVERWATERCORRECTION') LLTM_Config%ApplyOverWaterCorrection = TextToLogical(ItemValue)
             IF (TRIM(ItemName) .EQ. 'RADIATIONMETHOD') LLTM_Config%RadiationMethod = TextToInteger(ItemValue)
-            IF (TRIM(ItemName) .EQ. 'ICEALBEDO') THEN ! TODO: always print!
-                LLTM_Config%ICEALBEDO = TextToReal(ItemValue)
-                write(*,*) 'ICE ALBEDO:', LLTM_Config%ICEALBEDO
-            END IF
-            IF (TRIM(ItemName) .EQ. 'ICETHRESH') THEN ! TODO: always print!
-                LLTM_Config%ICETHRESH = TextToReal(ItemValue)
-                write(*,*) 'ICE TEMP THRESH:', LLTM_Config%ICETHRESH
-            END IF
          END IF
          READ(U1, 1101, IOSTAT=IOS) Line
       END DO
@@ -1168,11 +1168,25 @@ CONTAINS
       !
       !  Parameters
       !
-      DO I = 1, 13
+      DO I = 1, 10
          READ(U1, 1001, ERR=812) Line
          CALL ParseCommaSepLine(Line, CsvStrings, Entries)
          READ(CsvStrings(1), *, ERR=830) EParms%Parms(I)
       END DO
+
+      ! IceAlbedo and IceThresh (JAK add; Mar 2023)
+      READ(U1, 1001, ERR=812) Line
+      CALL ParseCommaSepLine(Line, CsvStrings, Entries)
+      READ(CsvStrings(1), *, ERR=830) EParms%IceThresh
+      READ(U1, 1001, ERR=812) Line
+      CALL ParseCommaSepLine(Line, CsvStrings, Entries)
+      READ(CsvStrings(1), *, ERR=830) EParms%IceAlbedo
+
+      write(*,*) 'ICE ALBEDO:', EParms%IceAlbedo
+      write(*,*) 'ICE THRESH:', EParms%IceThresh
+
+      ! read 13th (unused param)
+      READ(U1, 1001, ERR=812) Line ! this should advance it
       
       !
       !  Dates
@@ -2291,11 +2305,12 @@ CONTAINS
       SUBROUTINE BalanceElevAndTempAndEvap(               &
              Day, Month, Year, DailyMet,                  & 
              Runoff, Precipitation, Inflow, Outflow,      & 
-             OtherTerms, SurfaceElevation, Evaporation)
+             OtherTerms, SurfaceElevation, Evaporation, IceThresh, IceAlbedo)
      
       IMPLICIT NONE
       INTEGER, INTENT(IN)    :: Day, Month, Year
       REAL,    INTENT(IN)    :: Runoff, Precipitation, Inflow, Outflow, OtherTerms
+      REAL,    INTENT(IN)    :: IceAlbedo, IceThresh 
       REAL,    INTENT(INOUT) :: SurfaceElevation
       REAL,    INTENT(OUT)   :: Evaporation
       TYPE (TMetData), INTENT(INOUT)  :: DailyMet        ! met data for a single day (in & out)
@@ -2325,8 +2340,6 @@ CONTAINS
       REAL    :: DeltaStoredHeat
       
       REAL    :: AirTempNew, DewPtTempNew, WindSpeedNew
-      REAL    :: IceAlbedo
-      REAL    :: IceThresh
    
 
       !
@@ -2539,7 +2552,7 @@ CONTAINS
          !END IF
 
          !
-         IceAlbedo = ModelCfg%ICEALBEDO ! JAK ADD
+         !IceAlbedo = EParms%IceThresh ! JAK ADD (REMOVE)
          DRRI = Incident*IceAlbedo
          !DRRI = DailyReflectedRadiationFromIceJAK(Incident, IceAlbedo)
          !DRRI = DailyReflectedRadiationFromIce(Incident,                                   &
@@ -2569,7 +2582,7 @@ CONTAINS
          !  the water temperature toward freezing temperature, in calories.
          !
          !H = HeatInStorage(0.0);                     IF (ErrorLevel .NE. 0) GOTO 899
-         IceThresh = ModelCfg%ICETHRESH ! JAK ADD
+         !IceThresh = EParms%IceThresh ! JAK ADD (REMOVE)
          H = HeatInStorage(IceThresh);                     
          IF (ErrorLevel .NE. 0) GOTO 899
          WaterIceFlux = StoredHeatAtEndOfDay - H
