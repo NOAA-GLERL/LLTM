@@ -1539,7 +1539,7 @@ CONTAINS
       !
       NumDays = ESeqReq - SSeqReq + 1
       IF (NumDays .LT.       1)      GOTO 701
-      IF (NumDays .GT. 365*250)      GOTO 702
+      IF (NumDays .GT. 365*1500)      GOTO 702
       IF (SSeqReq .LT. MetData%SSeq) GOTO 703
       IF (ESeqReq .GT. MetData%ESeq) GOTO 704
             
@@ -1629,7 +1629,7 @@ CONTAINS
       !  Error handling
       !
   701 ErrorMessage = 'Requested end date before requested start date.';  CALL PassMsg;  GOTO 898
-  702 ErrorMessage = 'Requested data period > 250 years.';               CALL PassMsg;  GOTO 898
+  702 ErrorMessage = 'Requested data period > 1500 years.';               CALL PassMsg;  GOTO 898
   703 ErrorMessage = 'Requested start date before available met data';   CALL PassMsg;  GOTO 898
   704 ErrorMessage = 'Requested end date after available met data.';     CALL PassMsg;  GOTO 898
 

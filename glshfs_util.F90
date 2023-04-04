@@ -1487,7 +1487,7 @@ CONTAINS
       READ(SD, *, ERR=888) D
       READ(SY, *, ERR=888) Y
       IF ((M .LT. 1) .OR. (M .GT. 12)) GOTO 888
-      IF ((Y .LT. 1000) .OR. (Y .GT. 2999)) GOTO 888
+      IF ((Y .LT. 1000) .OR. (Y .GT. 3999)) GOTO 888
       IF ((D .LT. 1) .OR. (D .GT. DaysInMonth(M,Y))) GOTO 888
 
       CALL DateSequence(D, M, Y, SeqNum); IF (ErrorLevel .NE. 0) GOTO 888
@@ -1528,7 +1528,7 @@ CONTAINS
       READ(SY, *, ERR=888) Y
       READ(SM, *, ERR=888) M
       READ(SD, *, ERR=888) D
-      IF ((Y .LT. 1000) .OR. (Y .GT. 2999)) GOTO 888
+      IF ((Y .LT. 1000) .OR. (Y .GT. 3999)) GOTO 888
       IF ((M .LT. 1) .OR. (M .GT. 12)) GOTO 888
       IF ((D .LT. 1) .OR. (D .GT. DaysInMonth(M,Y))) GOTO 888
 
@@ -1666,7 +1666,7 @@ CONTAINS
 
       DaysInYear = -1
       IF (Year .LT. 1)    GOTO 899
-      IF (Year .GT. 2999) GOTO 899
+      IF (Year .GT. 3999) GOTO 899
       CALL DateSequence( 1,  1, Year, Seq1); IF (ErrorLevel .NE. 0) RETURN
       CALL DateSequence(31, 12, Year, Seq2); IF (ErrorLevel .NE. 0) RETURN
       DaysInYear = Seq2 - Seq1
@@ -1686,7 +1686,7 @@ CONTAINS
       IF (Month .LT. 1)   GOTO 899
       IF (Month .GT. 12)  GOTO 899
       IF (Year .LT. 1)    GOTO 899
-      IF (Year .GT. 2999) GOTO 899
+      IF (Year .GT. 3999) GOTO 899
       M1 = Month
       Y1 = Year
       M2 = Month + 1
@@ -2773,7 +2773,7 @@ CONTAINS
        INTEGER :: DD, DM, Q
        StartOfQtr3 = -1
        IF (Year .LT. 1)    GOTO 801
-       IF (Year .GT. 2999) GOTO 801
+       IF (Year .GT. 3999) GOTO 801
        IF (Month .LT. 1)   GOTO 801
        IF (Month .GT. 12)  GOTO 801
        DD = DaysInMonth(Month, Year); IF (ErrorLevel .NE. 0) RETURN
@@ -2837,7 +2837,7 @@ CONTAINS
        INTEGER :: DD, DM, Q
        EndOfQtr3 = -1
        IF (Year .LT. 1)    GOTO 801
-       IF (Year .GT. 2999) GOTO 801
+       IF (Year .GT. 3999) GOTO 801
        IF (Month .LT. 1)   GOTO 801
        IF (Month .GT. 12)  GOTO 801
        DD = DaysInMonth(Month, Year); IF (ErrorLevel .NE. 0) RETURN
