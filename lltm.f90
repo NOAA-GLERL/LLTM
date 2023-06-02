@@ -245,9 +245,7 @@ MODULE LLTM_GLOBAL
       TYPE TEvapParms
          CHARACTER (LEN=3)  :: Bsn
          CHARACTER (LEN=99) :: Comments(3)
-         REAL    :: Parms(11)                   !  1-10 are relevant, 11 is  unused
-         REAL    :: IceAlbedo
-         REAL    :: IceThresh
+         REAL    :: Parms(13)                   !  1-10 are relevant, 11-13 are unused
          INTEGER :: SSeq, ESeq
          REAL    :: SurfTemp              ! deg C
          REAL    :: IceArea               ! fraction (0.0 - 1.0)
@@ -388,7 +386,6 @@ CONTAINS
       REAL :: Runoff, Precipitation, Inflow, Outflow
       REAL :: SurfaceElevation, OtherTerms, LakeEvaporation
       REAL :: P1, P2, P3, P4, P5, P6, P7, P8, P9, P10
-      REAL :: IceAlbedo, IceThresh
       REAL :: DD1, DD2, TT1, A, B, Delta, Temp
       REAL :: OutVal(20)
       REAL :: VapPres, XDewPt                 ! inline function and the variable used for it
@@ -587,13 +584,6 @@ CONTAINS
       P9  = ModelParms%Parms(9)
       P10 = ModelParms%Parms(10)
 
-
-      ! Add ice threshold and ice albedo params (JAK Mar 2023)
-      IceThresh = ModelParms%IceThresh
-      IceAlbedo = ModelParms%IceAlbedo
-
-
-
       !
       !  Calculate some global constants based on the value of the parameters.
       !  These are used in various calculations of heat storage, surface temp, etc.
@@ -765,7 +755,7 @@ CONTAINS
              Dy, Mn, Yr, DailyMet,                          &
              Runoff, Precipitation, Inflow, Outflow,        &
              OtherTerms, SurfaceElevation,                  &
-             LakeEvaporation, IceThresh, IceAlbedo)
+             LakeEvaporation
          IF (ErrorLevel .NE. 0) GOTO 899
          
          IF (g_MonitoringDepth .GT. 0.0) THEN                                    ! 24apr01
@@ -1173,20 +1163,6 @@ CONTAINS
          CALL ParseCommaSepLine(Line, CsvStrings, Entries)
          READ(CsvStrings(1), *, ERR=830) EParms%Parms(I)
       END DO
-
-      ! IceAlbedo and IceThresh (JAK add; Mar 2023)
-      READ(U1, 1001, ERR=812) Line
-      CALL ParseCommaSepLine(Line, CsvStrings, Entries)
-      READ(CsvStrings(1), *, ERR=830) EParms%IceThresh
-      READ(U1, 1001, ERR=812) Line
-      CALL ParseCommaSepLine(Line, CsvStrings, Entries)
-      READ(CsvStrings(1), *, ERR=830) EParms%IceAlbedo
-
-      write(*,*) 'ICE ALBEDO:', EParms%IceAlbedo
-      write(*,*) 'ICE THRESH:', EParms%IceThresh
-
-      ! read 13th (unused param)
-      READ(U1, 1001, ERR=812) Line ! this should advance it
       
       !
       !  Dates
@@ -1820,8 +1796,8 @@ CONTAINS
       WRITE(U1, 1018, ERR=813) EParms%Parms(8)
       WRITE(U1, 1019, ERR=813) EParms%Parms(9)
       WRITE(U1, 1020, ERR=813) EParms%Parms(10)
-      WRITE(U1, 1021, ERR=813) Eparms%IceThresh
-      WRITE(U1, 1021, ERR=813) Eparms%IceAlbedo
+      WRITE(U1, 1021, ERR=813) MissingData_Real, 11
+      WRITE(U1, 1021, ERR=813) MissingData_Real, 12
       WRITE(U1, 1021, ERR=813) MissingData_Real, 13
 
       !
@@ -1880,9 +1856,7 @@ CONTAINS
  1018 FORMAT(E12.5E2, ',   Temperature-model-related parameter, "V sub e"')
  1019 FORMAT(E12.5E2, ',   Temperature-model-related parameter, "p"')
  1020 FORMAT(E12.5E2, ',   Ice-model-related parameter, "tau sub w"')
- 1021 FORMAT(E12.5E2, ',   Ice-model-related parameter, "IceThresh"')
- 1022 FORMAT(E12.5E2, ',   Ice-model-related parameter, "IceAlbedo"')
- 1023 FORMAT(E12.5E2, ',   Unused parameters value ', I0)
+ 1021 FORMAT(E12.5E2, ',   Unused parameters value ', I0)
 
  1031 FORMAT(A, ',   Start Date (YYYY-MM-DD)')
  1032 FORMAT(A, ',   End   Date (YYYY-MM-DD)')
@@ -2307,12 +2281,11 @@ CONTAINS
       SUBROUTINE BalanceElevAndTempAndEvap(               &
              Day, Month, Year, DailyMet,                  & 
              Runoff, Precipitation, Inflow, Outflow,      & 
-             OtherTerms, SurfaceElevation, Evaporation, IceThresh, IceAlbedo)
+             OtherTerms, SurfaceElevation, Evaporation)
      
       IMPLICIT NONE
       INTEGER, INTENT(IN)    :: Day, Month, Year
       REAL,    INTENT(IN)    :: Runoff, Precipitation, Inflow, Outflow, OtherTerms
-      REAL,    INTENT(IN)    :: IceAlbedo, IceThresh 
       REAL,    INTENT(INOUT) :: SurfaceElevation
       REAL,    INTENT(OUT)   :: Evaporation
       TYPE (TMetData), INTENT(INOUT)  :: DailyMet        ! met data for a single day (in & out)
@@ -2554,12 +2527,9 @@ CONTAINS
          !END IF
 
          !
-         !IceAlbedo = EParms%IceThresh ! JAK ADD (REMOVE)
-         DRRI = Incident*IceAlbedo
-         !DRRI = DailyReflectedRadiationFromIceJAK(Incident, IceAlbedo)
-         !DRRI = DailyReflectedRadiationFromIce(Incident,                                   &
-         !       FractionInBareIce, FractionInNewSnow, FractionInOldSnow,                   &
-         !       FractionInMeltingSnow)
+         DRRI = DailyReflectedRadiationFromIce(Incident,                                   &
+                FractionInBareIce, FractionInNewSnow, FractionInOldSnow,                   &
+                FractionInMeltingSnow)
          IF (ErrorLevel .NE. 0) GOTO 899
          
          IceA = (g_IceArea + TIceArea) / 2.0 * 10000.
@@ -2583,10 +2553,7 @@ CONTAINS
          !  If positive, WaterIceFlux is the heat available to melt ice by lowering
          !  the water temperature toward freezing temperature, in calories.
          !
-         !H = HeatInStorage(0.0);                     IF (ErrorLevel .NE. 0) GOTO 899
-         !IceThresh = EParms%IceThresh ! JAK ADD (REMOVE)
-         H = HeatInStorage(IceThresh);                     
-         IF (ErrorLevel .NE. 0) GOTO 899
+         H = HeatInStorage(0.0);                     IF (ErrorLevel .NE. 0) GOTO 899
          WaterIceFlux = StoredHeatAtEndOfDay - H
          StoredHeatAtEndOfDay = StoredHeatAtEndOfDay - WaterIceFlux
 
@@ -2643,13 +2610,9 @@ CONTAINS
       !
       g_Incident = Incident / 2.06346
       
-      
-      DRRI = Incident*IceAlbedo
-      !write(*,*) DRRI, Incident, IceAlbedo
-      !DRRI = DailyReflectedRadiationFromIceJAK(Incident,IceAlbedo)
-      !DRRI = DailyReflectedRadiationFromIce(Incident,                      &
-       !     FractionInBareIce, FractionInNewSnow, FractionInOldSnow,       &
-       !     FractionInMeltingSnow);   IF (ErrorLevel .NE. 0) GOTO 899
+      DRRI = DailyReflectedRadiationFromIce(Incident,                      &
+            FractionInBareIce, FractionInNewSnow, FractionInOldSnow,       &
+            FractionInMeltingSnow);   IF (ErrorLevel .NE. 0) GOTO 899
       g_Reflect = 0.0 - (Incident * 0.10 * FractionInOpenWater             &
                        + DRRI * FractionInIce) / 2.06346
       
@@ -3125,14 +3088,6 @@ CONTAINS
 
       END FUNCTION DailyIncidentSolarRadiation
 
-!      REAL FUNCTION DailyReflectedRadiationFromIceJAK(Incident, Albedo)
-!          IMPLICIT NONE
-!          REAL, INTENT(IN) :: Incident, Albedo
-!          DailyReflectedRadiationFromIceJAK = Incident * Albedo
-!
-!          RETURN
-!
-!      END FUNCTION DailyReflectedRadiationFromIceJAK
 !----------------------------------------------------------------------------
       !------------------------------------------------------------------------
       !  DailyReflectedRadiationFromIce = Daily solar radiation reflected

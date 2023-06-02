@@ -1,12 +1,11 @@
 # LLTM
 
-This is the standalone version of LLTM which enables the setting of:
+This is the standalone version of LLTM which DOES NOT allow the setting of:
 - Ice Threshold--the temperature at which ice begins to form
 - Ice Albedo
 
-via lines 15 and 16, respectively of the  **paramter**  files
+These are both set as defaults.  (IceThresh=0 C; IceAlbedo=0.45)
 
-(This is the main branch that Zoe should use.)
 
 
 
