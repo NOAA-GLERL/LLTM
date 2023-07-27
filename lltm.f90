@@ -755,7 +755,7 @@ CONTAINS
              Dy, Mn, Yr, DailyMet,                          &
              Runoff, Precipitation, Inflow, Outflow,        &
              OtherTerms, SurfaceElevation,                  &
-             LakeEvaporation
+             LakeEvaporation)
          IF (ErrorLevel .NE. 0) GOTO 899
          
          IF (g_MonitoringDepth .GT. 0.0) THEN                                    ! 24apr01
@@ -1158,7 +1158,7 @@ CONTAINS
       !
       !  Parameters
       !
-      DO I = 1, 10
+      DO I = 1, 13
          READ(U1, 1001, ERR=812) Line
          CALL ParseCommaSepLine(Line, CsvStrings, Entries)
          READ(CsvStrings(1), *, ERR=830) EParms%Parms(I)
